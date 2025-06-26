@@ -6,6 +6,7 @@ import zod from 'zod';
 import bcrypt from 'bcrypt';
 import jwt, { sign } from 'jsonwebtoken'
 import { authMiddleware } from "./middleware";
+import { getTransactions } from "./controllers/transactions";
 
 dotenv.config();
 const app = express();
@@ -102,6 +103,9 @@ app.post('/auth/login', async (req: Request, res: Response): Promise<any> => {
 app.get('/dashboard', authMiddleware, (req: Request, res: Response) => {
     res.send('Middleware Working!')
 })
+
+//get transactions data
+app.get('/transactions', authMiddleware, getTransactions);
 
 // Start server
 app.listen(port, () => {
