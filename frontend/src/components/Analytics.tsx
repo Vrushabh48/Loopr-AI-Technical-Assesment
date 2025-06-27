@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(
   LineElement,
@@ -61,7 +62,7 @@ type AnalyticsData = {
 
 export default function Analytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
@@ -69,12 +70,17 @@ export default function Analytics() {
           withCredentials: true,
         });
         setAnalytics(res.data);
-      } catch (err) {
-        console.error("Failed to fetch analytics", err);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        if (err.response && err.response.status === 401) {
+          navigate("/login");
+        } else {
+          console.error("Failed to fetch analytics", err);
+        }
       }
     };
     fetchAnalytics();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="space-y-8">
