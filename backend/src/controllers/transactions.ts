@@ -10,8 +10,7 @@ export const getTransactions = async (req: Request, res: Response) => {
       user_id,
       dateFrom,
       dateTo,
-      minAmount,
-      maxAmount,
+      amount,
       search,
       page = '1',
       limit = '10',
@@ -39,10 +38,8 @@ export const getTransactions = async (req: Request, res: Response) => {
       if (dateTo) filters.date.$lte = new Date(dateTo as string);
     }
 
-    if (minAmount || maxAmount) {
-      filters.amount = {};
-      if (minAmount) filters.amount.$gte = parseFloat(minAmount as string);
-      if (maxAmount) filters.amount.$lte = parseFloat(maxAmount as string);
+    if (amount) {
+      filters.amount = { $gte: Number(amount) };
     }
 
     if (search) {

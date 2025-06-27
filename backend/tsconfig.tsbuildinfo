@@ -1,1 +1,1 @@
-{"root":["./src/db.ts","./src/index.ts","./src/middleware.ts","./src/seed.ts","./src/controllers/transactions.ts"],"version":"5.6.2"}
+{"root":["./src/db.ts","./src/index.ts","./src/middleware.ts","./src/seed.ts","./src/controllers/analytics.ts","./src/controllers/transactions.ts"],"version":"5.6.2"}

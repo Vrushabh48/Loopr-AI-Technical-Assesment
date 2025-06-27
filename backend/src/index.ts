@@ -9,6 +9,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { authMiddleware } from "./middleware";
 import { getTransactions } from "./controllers/transactions";
+import { getAnalytics } from "./controllers/analytics";
 
 dotenv.config();
 const app = express();
@@ -154,6 +155,8 @@ app.get("/dashboard", authMiddleware, (req: Request, res: Response) => {
 // Transactions route
 app.get("/transactions", authMiddleware, getTransactions);
 
+//analytics route
+app.get("/analytics", authMiddleware, getAnalytics);
 // Start server
 app.listen(port, () => {
   console.log(`Server is listening on Port ${port}`);
