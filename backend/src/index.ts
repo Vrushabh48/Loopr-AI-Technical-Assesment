@@ -18,10 +18,14 @@ const port = 3000;
 // CORS with credentials
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow all origins when credentials are enabled
+      callback(null, origin || '*');
+    },
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -145,7 +149,7 @@ app.post("/auth/logout", (req: Request, res: Response) => {
   res.json({ message: "Logged out" });
 });
 
-// Protected route
+// Protected routes ------>
 app.get("/dashboard", authMiddleware, (req: Request, res: Response) => {
   res.send("Middleware Working!");
 });

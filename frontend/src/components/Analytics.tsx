@@ -63,11 +63,12 @@ type AnalyticsData = {
 export default function Analytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null); //analytics data
   const navigate = useNavigate();
+  const base_url = import.meta.env.VITE_REACT_APP_BASE_URL;
   useEffect(() => {
     //fetching the data
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/analytics", {
+        const res = await axios.get(`${base_url}/analytics`, {
           withCredentials: true,
         });
         setAnalytics(res.data);
@@ -81,7 +82,7 @@ export default function Analytics() {
       }
     };
     fetchAnalytics();
-  }, [navigate]);
+  }, [base_url, navigate]);
 
   return (
     <div className="space-y-8">

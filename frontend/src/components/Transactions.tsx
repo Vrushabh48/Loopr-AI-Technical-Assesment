@@ -131,7 +131,7 @@ export default function Transaction() {
     status: "",
     user_id: "",
   });
-
+  const base_url = import.meta.env.VITE_REACT_APP_BASE_URL;
   const [showDateRange, setShowDateRange] = useState(false);
   const [range, setRange] = useState<Range[]>([
     {
@@ -177,7 +177,7 @@ export default function Transaction() {
       if (search) queryParams.append("search", search);
 
       const res = await axios.get(
-        `http://localhost:3000/transactions?${queryParams.toString()}`,
+        `${base_url}/transactions?${queryParams.toString()}`,
         { withCredentials: true }
       );
 

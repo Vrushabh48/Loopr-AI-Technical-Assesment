@@ -48,11 +48,11 @@ type AnalyticsData = {
 export default function DashboardData() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const navigate = useNavigate();
-
+  const base_url = import.meta.env.VITE_REACT_APP_BASE_URL;
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/analytics", {
+        const res = await axios.get(`${base_url}/analytics`, {
           withCredentials: true,
         });
         setAnalytics(res.data);
@@ -67,7 +67,7 @@ export default function DashboardData() {
     };
 
     fetchAnalytics();
-  }, [navigate]);
+  }, [base_url, navigate]);
   return (
     <>
       {/* Summary Cards */}

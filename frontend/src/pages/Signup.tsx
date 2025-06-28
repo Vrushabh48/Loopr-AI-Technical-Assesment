@@ -22,6 +22,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const base_url = import.meta.env.VITE_REACT_APP_BASE_URL;
 
   useEffect(() => {
     setIsMounted(true);
@@ -36,7 +37,7 @@ export default function SignupPage() {
   setError("");
 
   try {
-    const res = await axios.post("http://localhost:3000/auth/signup", formData, {
+    const res = await axios.post(`${base_url}/auth/signup`, formData, {
       withCredentials: true, 
     });
 

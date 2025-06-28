@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FaChartBar, FaExchangeAlt, FaBars } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import Analytics from "../components/Analytics";
@@ -6,11 +6,28 @@ import DashboardData from "../components/DashboardData";
 import Transaction from "../components/Transactions";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
+  const base_url = import.meta.env.VITE_REACT_APP_BASE_URL;
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${base_url}/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#131417] text-white flex flex-col md:flex-row">
@@ -76,11 +93,48 @@ export default function Dashboard() {
                 className="bg-transparent outline-none text-sm ml-2 w-24 sm:w-auto"
               />
             </div>
-            <div
-              className="cursor-pointer text-2xl text-gray-300 hover:text-white"
-              onClick={() => navigate("/profile")}
-            >
-              <FaUserCircle />
+            <div className="relative" ref={menuRef}>
+              <button
+                aria-label="User menu"
+                aria-expanded={open}
+                aria-haspopup="true"
+                className="cursor-pointer text-2xl text-gray-300 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                onClick={() => setOpen((prev) => !prev)}
+              >
+                <FaUserCircle />
+              </button>
+
+              {open && (
+                <div
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu-button"
+                >
+                  <div className="py-1" role="none">
+                    <button
+                      className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate("/profile");
+                        setOpen(false);
+                      }}
+                    >
+                      Profile
+                    </button>
+                    <button
+                      className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors duration-200"
+                      role="menuitem"
+                      onClick={() => {
+                        handleLogout();
+                        setOpen(false);
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

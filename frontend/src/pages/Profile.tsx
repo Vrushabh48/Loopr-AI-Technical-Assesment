@@ -14,11 +14,12 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const base_url = import.meta.env.VITE_REACT_APP_BASE_URL;
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/profile", {
+        const res = await axios.get( `${base_url}/profile`, {
           withCredentials: true,
         });
         setProfile(res.data);
@@ -31,7 +32,7 @@ export default function Profile() {
     };
 
     fetchProfile();
-  }, []);
+  }, [base_url]);
 
   if (loading)
     return (
