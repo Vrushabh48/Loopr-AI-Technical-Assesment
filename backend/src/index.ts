@@ -17,7 +17,7 @@ const port = 3000;
 // This should come BEFORE any routes
 app.use(
   cors({
-    origin: "*",
+    origin: "https://penta-financial-analytics.vercel.app",
   })
 );
 app.options("*", cors());
