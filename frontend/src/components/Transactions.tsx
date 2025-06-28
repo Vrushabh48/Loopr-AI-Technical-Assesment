@@ -242,8 +242,10 @@ export default function Transaction() {
         if (search) queryParams.append("search", search);
 
         const res = await axios.get(
-          `http://localhost:3000/transactions?${queryParams.toString()}`,
-          { withCredentials: true }
+          `${base_url}/transactions?${queryParams.toString()}`,
+          { headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }, }
         );
 
         setTransactions(res.data.data || []);
@@ -260,7 +262,7 @@ export default function Transaction() {
     };
 
     fetchTransactions();
-  }, [filters, page, sortBy, sortOrder, search, navigate]);
+  }, [filters, page, sortBy, sortOrder, search, navigate, base_url]);
 
   const handleSearchChange = debounce((text: string) => {
     setSearch(text);
