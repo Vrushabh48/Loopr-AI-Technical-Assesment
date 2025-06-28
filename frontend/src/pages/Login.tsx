@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     try {
       const res = await axios.post(
-        `${base_url}/auth.login`,
+        `${base_url}/auth/login`,
         formData,
         {
           withCredentials: true,
