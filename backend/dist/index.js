@@ -29,10 +29,7 @@ const app = (0, express_1.default)();
 const port = 3000;
 // CORS with credentials
 app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        // Allow all origins when credentials are enabled
-        callback(null, origin || '*');
-    },
+    origin: "https://penta-financial-analytics.vercel.app",
     credentials: true,
 }));
 app.use(express_1.default.json());
