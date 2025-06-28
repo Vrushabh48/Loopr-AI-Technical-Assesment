@@ -26,11 +26,13 @@ const analytics_1 = require("./controllers/analytics");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = 3000;
-// CORS with credentials
+// This should come BEFORE any routes
 app.use((0, cors_1.default)({
     origin: "https://penta-financial-analytics.vercel.app",
-    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
+app.options("*", (0, cors_1.default)());
 app.use(express_1.default.json());
 // MongoDB Connection
 mongoose_1.default
