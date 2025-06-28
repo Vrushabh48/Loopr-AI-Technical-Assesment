@@ -14,12 +14,15 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
-// CORS with credentials
+// This should come BEFORE any routes
 app.use(
   cors({
-    origin: "*",
+    origin: "https://penta-financial-analytics.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 app.use(express.json());
 
