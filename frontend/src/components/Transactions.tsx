@@ -50,7 +50,7 @@ const CSVExportModal = ({ isOpen, onClose, onExport, defaultColumns }: CSVExport
   };
 
   if (!isOpen) return null;
-
+  //exportCSV config window
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-[#1E1F25] rounded-xl p-6 w-full max-w-md border border-[#2D2F36]">
@@ -145,6 +145,7 @@ export default function Transaction() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [showExportModal, setShowExportModal] = useState(false);
 
+  //sorting the data
   const handleSort = (field: string) => {
     if (sortBy === field) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -189,6 +190,7 @@ export default function Transaction() {
   };
 
   useEffect(() => {
+    //fetching transactions data
     const fetchTransactions = async () => {
       setLoading(true);
       try {

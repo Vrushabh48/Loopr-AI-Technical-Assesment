@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
-// Enable CORS with credentials
+// CORS with credentials
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -26,7 +26,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// Connect to MongoDB
+// Connecting to MongoDB
 mongoose
   .connect(process.env.DATABASE_URL!, {
     dbName: "FinAppDB",
@@ -37,10 +37,6 @@ mongoose
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
-
-app.get("/", (req: Request, res: Response) => {
-  res.json("Working!!");
-});
 
 // Zod validation for signup
 const signupBody = zod.object({
@@ -65,7 +61,7 @@ app.post("/auth/signup", async (req: Request, res: Response): Promise<any> => {
 
     const { name, email, password, designation, phone } = result.data;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10); //password hashing
 
     const user = await UserModel.create({
       email,
@@ -75,15 +71,17 @@ app.post("/auth/signup", async (req: Request, res: Response): Promise<any> => {
       phone,
     });
 
+    //generating the jwt token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
+      expiresIn: "1h",
     });
 
+    //setting the cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 60 * 60 * 1000,
     });
 
     return res.status(201).json({ message: "Signup Successful!" });

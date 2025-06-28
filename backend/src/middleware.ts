@@ -14,7 +14,7 @@ if (!JWT_SECRET) {
 declare global {
   namespace Express {
     interface Request {
-      user?: any; // You can replace `any` with your decoded token type
+      user?: any;
     }
   }
 }

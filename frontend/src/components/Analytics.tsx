@@ -61,9 +61,10 @@ type AnalyticsData = {
 };
 
 export default function Analytics() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null); //analytics data
   const navigate = useNavigate();
   useEffect(() => {
+    //fetching the data
     const fetchAnalytics = async () => {
       try {
         const res = await axios.get("http://localhost:3000/analytics", {

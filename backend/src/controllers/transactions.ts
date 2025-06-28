@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { Transaction } from '../db';
 
-// Fetching the transactions
 export const getTransactions = async (req: Request, res: Response) => {
   try {
     const {
@@ -20,45 +19,48 @@ export const getTransactions = async (req: Request, res: Response) => {
 
     const filters: any = {};
 
-    if (category) {
-      filters.category = { $regex: new RegExp(category as string, 'i') };
-    }
+    // Exact or partial match filters
+    if (category) filters.category = new RegExp(category as string, 'i');
+    if (status) filters.status = new RegExp(status as string, 'i');
+    if (user_id) filters.user_id = user_id; // Assumes exact match
 
-    if (status) {
-      filters.status = { $regex: new RegExp(status as string, 'i') };
-    }
-
-    if (user_id) {
-      filters.user_id = { $regex: new RegExp(user_id as string, 'i') };
-    }
-
+    // Date range
     if (dateFrom || dateTo) {
       filters.date = {};
       if (dateFrom) filters.date.$gte = new Date(dateFrom as string);
       if (dateTo) filters.date.$lte = new Date(dateTo as string);
     }
 
+    // Amount filter
     if (amount) {
       filters.amount = { $gte: Number(amount) };
     }
 
+    // Search logic
     if (search) {
+      const searchRegex = new RegExp(search as string, 'i');
       filters.$or = [
-        { user_id: { $regex: search as string, $options: 'i' } },
-        { category: { $regex: search as string, $options: 'i' } },
-        { status: { $regex: search as string, $options: 'i' } },
+        { category: searchRegex },
+        { status: searchRegex },
+        { user_id: searchRegex },
       ];
     }
 
+    // Pagination & Sorting
     const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
     const sortDirection = sortOrder === 'asc' ? 1 : -1;
 
-    const transactions = await Transaction.find(filters)
-      .sort({ [sortBy as string]: sortDirection })
-      .skip(skip)
-      .limit(parseInt(limit as string));
+    // limiting the fields if frontend does not needs it.
+    const projection = {};
 
-    const total = await Transaction.countDocuments(filters);
+    // optimizing and sorting
+    const [transactions, total] = await Promise.all([
+      Transaction.find(filters, projection)
+        .sort({ [sortBy as string]: sortDirection })
+        .skip(skip)
+        .limit(parseInt(limit as string)),
+      Transaction.countDocuments(filters),
+    ]);
 
     res.json({
       data: transactions,

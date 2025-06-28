@@ -94,7 +94,7 @@ export default function Dashboard() {
   );
 }
 
-// Properly typed NavItem component
+//NavItem component
 type NavItemProps = {
   icon: React.ReactNode;
   label: string;
