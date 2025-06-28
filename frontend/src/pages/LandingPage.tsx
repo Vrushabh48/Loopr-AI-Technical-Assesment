@@ -1,5 +1,24 @@
 // src/pages/Landing.tsx
 import { useNavigate } from "react-router-dom";
+import { ShieldCheck, BarChart2, FileDown } from "lucide-react";
+
+const features = [
+  {
+    title: "Secure Login",
+    desc: "JWT-based authentication keeps your data safe.",
+    icon: <ShieldCheck className="w-10 h-10 text-indigo-600 mb-4" />,
+  },
+  {
+    title: "Dynamic Dashboard",
+    desc: "Interactive charts and analytics for fast decision-making.",
+    icon: <BarChart2 className="w-10 h-10 text-indigo-600 mb-4" />,
+  },
+  {
+    title: "Smart Exports",
+    desc: "Download customized CSVs directly from the browser.",
+    icon: <FileDown className="w-10 h-10 text-indigo-600 mb-4" />,
+  },
+];
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -8,7 +27,7 @@ export default function Landing() {
     <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
       {/* Navbar */}
       <nav className="flex justify-between items-center p-6 bg-white shadow">
-        <div className="text-2xl font-bold text-indigo-600">Penta</div>
+        <div className="text-2xl font-bold text-indigo-600"><h1 className="text-4xl font-bold font-serifDisplay md:ml-10">Penta</h1></div>
         <button
           onClick={() => navigate("/signup")}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
@@ -53,29 +72,27 @@ export default function Landing() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-          {[
-            {
-              title: "Secure Login",
-              desc: "JWT-based authentication keeps your data safe.",
-            },
-            {
-              title: "Dynamic Dashboard",
-              desc: "Interactive charts and analytics for fast decision-making.",
-            },
-            {
-              title: "Smart Exports",
-              desc: "Download customized CSVs directly from the browser.",
-            },
-          ].map((f) => (
-            <div key={f.title}>
-              <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
-              <p className="text-gray-600">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <section className="py-20 px-6 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-6xl mx-auto text-center mb-12">
+        <h2 className="text-3xl font-bold text-gray-800">Powerful Features</h2>
+        <p className="text-gray-500 mt-2">
+          Everything you need to analyze and export your financial data
+        </p>
+      </div>
+
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+        {features.map((f) => (
+          <div
+            key={f.title}
+            className="bg-white shadow-lg hover:shadow-xl transition-shadow rounded-xl p-8 text-center"
+          >
+            {f.icon}
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">{f.title}</h3>
+            <p className="text-gray-600">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
 
       {/* Footer */}
       <footer className="text-center py-6 bg-gray-100 text-sm text-gray-500">
