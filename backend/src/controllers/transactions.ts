@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Transaction } from '../db';
 
-//fetching the transactions
+// Fetching the transactions
 export const getTransactions = async (req: Request, res: Response) => {
   try {
     const {

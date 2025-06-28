@@ -157,6 +157,27 @@ app.get("/transactions", authMiddleware, getTransactions);
 
 //analytics route
 app.get("/analytics", authMiddleware, getAnalytics);
+
+app.get('/profile', authMiddleware, async (req: Request, res: Response): Promise<any> => {
+  try {
+    const userId = req.user?.id;
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      name: user.name,
+      email: user.email,
+      designation: user.designation,
+      phone: user.phone
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+})
 // Start server
 app.listen(port, () => {
   console.log(`Server is listening on Port ${port}`);
