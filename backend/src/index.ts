@@ -20,8 +20,6 @@ app.use(
     origin: "https://penta-financial-analytics.vercel.app",
   })
 );
-app.options("*", cors());
-
 
 app.use(express.json());
 
@@ -33,7 +31,7 @@ mongoose
   .then(() => {
     console.log("Connected to MongoDB");
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error("MongoDB connection error:", err);
   });
 
