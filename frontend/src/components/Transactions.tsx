@@ -17,6 +17,105 @@ type Transaction = {
   status: "Paid" | "Pending";
 };
 
+type CSVExportModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onExport: (columns: (keyof Transaction)[], fileName: string) => void;
+  defaultColumns: (keyof Transaction)[];
+};
+
+const CSVExportModal = ({ isOpen, onClose, onExport, defaultColumns }: CSVExportModalProps) => {
+  const [fileName, setFileName] = useState("transactions_report");
+  const [selectedColumns, setSelectedColumns] = useState<(keyof Transaction)[]>(defaultColumns);
+
+  const columnOptions: { id: keyof Transaction; label: string }[] = [
+    { id: "user_id", label: "User ID" },
+    { id: "date", label: "Date" },
+    { id: "amount", label: "Amount" },
+    { id: "category", label: "Category" },
+    { id: "status", label: "Status" },
+  ];
+
+  const toggleColumn = (column: keyof Transaction) => {
+    setSelectedColumns(prev =>
+      prev.includes(column)
+        ? prev.filter(c => c !== column)
+        : [...prev, column]
+    );
+  };
+
+  const handleExport = () => {
+    onExport(selectedColumns, `${fileName}.csv`);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-[#1E1F25] rounded-xl p-6 w-full max-w-md border border-[#2D2F36]">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Export Configuration</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">
+            &times;
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm text-gray-300 mb-2">File Name</label>
+          <div className="flex">
+            <input
+              type="text"
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              className="bg-[#2D2F36] px-3 py-2 rounded-l text-sm w-full border-r border-[#1A1C22]"
+            />
+            <span className="bg-[#2D2F36] px-3 py-2 rounded-r text-sm text-gray-400 flex items-center">
+              .csv
+            </span>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm text-gray-300 mb-3">Columns to Export</label>
+          <div className="grid grid-cols-2 gap-2">
+            {columnOptions.map((column) => (
+              <div key={column.id} className="flex items-center">
+                <button
+                  onClick={() => toggleColumn(column.id)}
+                  className={`w-5 h-5 rounded mr-2 flex items-center justify-center ${selectedColumns.includes(column.id) ? 'bg-green-500' : 'bg-[#2D2F36] border border-[#3E4046]'}`}
+                >
+                  {selectedColumns.includes(column.id) && (
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+                <span className="text-sm">{column.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded text-sm bg-[#2D2F36] hover:bg-[#3E4046] transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 rounded text-sm bg-green-600 hover:bg-green-700 text-white transition"
+          >
+            Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Transaction() {
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -44,6 +143,7 @@ export default function Transaction() {
 
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -54,7 +154,11 @@ export default function Transaction() {
     }
   };
 
-  const handleExport = async () => {
+  const handleExportClick = () => {
+    setShowExportModal(true);
+  };
+
+  const handleExportConfirm = async (columns: (keyof Transaction)[], fileName: string) => {
     try {
       const queryParams = new URLSearchParams();
       queryParams.append("page", "1");
@@ -77,16 +181,7 @@ export default function Transaction() {
       );
 
       const allData: Transaction[] = res.data.data || [];
-
-      const selectedColumns: (keyof Transaction)[] = [
-        "user_id",
-        "date",
-        "amount",
-        "category",
-        "status",
-      ];
-
-      exportToCSV(allData, selectedColumns, "transactions_report.csv");
+      exportToCSV(allData, columns, fileName);
     } catch (err) {
       console.error("Export failed:", err);
       alert("Export failed. Please try again.");
@@ -157,6 +252,93 @@ export default function Transaction() {
     filters.dateFrom && filters.dateTo
       ? `${filters.dateFrom} → ${filters.dateTo}`
       : "Select Date Range";
+
+  const renderTable = () => (
+    <div className="overflow-x-auto rounded-lg border border-[#2D2F36]">
+      <table className="w-full text-sm">
+        <thead className="text-gray-400 bg-[#1E1F25]">
+          <tr>
+            <th 
+              className="p-3 cursor-pointer hover:bg-[#2D2F36] transition"
+              onClick={() => handleSort("user_id")}
+            >
+              <div className="flex items-center">
+                User
+                {sortBy === "user_id" && (
+                  <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
+            </th>
+            <th 
+              className="p-3 cursor-pointer hover:bg-[#2D2F36] transition"
+              onClick={() => handleSort("date")}
+            >
+              <div className="flex items-center">
+                Date
+                {sortBy === "date" && (
+                  <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
+            </th>
+            <th 
+              className="p-3 cursor-pointer hover:bg-[#2D2F36] transition"
+              onClick={() => handleSort("amount")}
+            >
+              <div className="flex items-center">
+                Amount
+                {sortBy === "amount" && (
+                  <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
+            </th>
+            <th 
+              className="p-3 cursor-pointer hover:bg-[#2D2F36] transition"
+              onClick={() => handleSort("status")}
+            >
+              <div className="flex items-center">
+                Status
+                {sortBy === "status" && (
+                  <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
+            </th>
+            <th className="p-3 hover:bg-[#2D2F36] transition">
+              Category
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-[#2D2F36]">
+          {transactions.map((tx) => (
+            <tr key={tx._id} className="hover:bg-[#1E1F25] transition">
+              <td className="p-3">{tx.user_id}</td>
+              <td className="p-3">{new Date(tx.date).toLocaleDateString()}</td>
+              <td className={`p-3 font-medium ${tx.category === "Expense" ? "text-red-400" : "text-green-400"}`}>
+                {tx.category === "Expense" ? `- $${tx.amount}` : `+ $${tx.amount}`}
+              </td>
+              <td className="p-3">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  tx.status === "Paid" 
+                    ? "bg-green-900 text-green-300" 
+                    : "bg-yellow-900 text-yellow-300"
+                }`}>
+                  {tx.status}
+                </span>
+              </td>
+              <td className="p-3">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  tx.category === "Revenue" 
+                    ? "bg-blue-900 text-blue-300" 
+                    : "bg-purple-900 text-purple-300"
+                }`}>
+                  {tx.category}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
     <div className="bg-[#1A1C22] p-4 rounded-xl overflow-hidden w-full font-poppins">
@@ -247,82 +429,44 @@ export default function Transaction() {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
-            <thead className="text-gray-400 text-left">
-              <tr>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("user_id")}>
-                  User {sortBy === "user_id" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
-                  Date {sortBy === "date" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("amount")}>
-                  Amount {sortBy === "amount" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("status")}>
-                  Status {sortBy === "status" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="p-2 cursor-pointer">
-                  Category {sortBy === "status" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((tx) => (
-                <tr key={tx._id} className="border-t border-gray-700">
-                  <td className="p-2">{tx.user_id}</td>
-                  <td className="p-2">{new Date(tx.date).toLocaleDateString()}</td>
-                  <td
-                    className={`p-2 ${
-                      tx.category === "Expense" ? "text-red-400" : "text-green-400"
-                    }`}
-                  >
-                    {tx.category === "Expense"
-                      ? `- $${tx.amount}`
-                      : `+ $${tx.amount}`}
-                  </td>
-                  <td className="p-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        tx.status === "Paid" ? "bg-green-700" : "bg-yellow-600"
-                      }`}
-                    >
-                      {tx.status}
-                    </span>
-                  </td>
-                  <td className="p-2">{tx.category}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        renderTable()
       )}
 
       <div className="mt-4 flex justify-between flex-wrap gap-2">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
-          className="bg-[#2D2F36] px-3 py-1 rounded text-sm"
+          disabled={page === 1}
+          className={`px-4 py-2 rounded text-sm ${page === 1 ? 'bg-[#2D2F36] text-gray-500 cursor-not-allowed' : 'bg-[#2D2F36] hover:bg-[#3E4046]'}`}
         >
           Previous
         </button>
         <button
           onClick={() => setPage((p) => p + 1)}
-          className="bg-[#2D2F36] px-3 py-1 rounded text-sm"
+          disabled={transactions.length < 10}
+          className={`px-4 py-2 rounded text-sm ${transactions.length < 10 ? 'bg-[#2D2F36] text-gray-500 cursor-not-allowed' : 'bg-[#2D2F36] hover:bg-[#3E4046]'}`}
         >
           Next
         </button>
         <button
-          onClick={handleExport}
-          className="bg-green-600 px-3 py-1 rounded text-sm text-white ml-auto"
+          onClick={handleExportClick}
+          className="px-4 py-2 rounded text-sm bg-green-600 hover:bg-green-700 text-white ml-auto"
         >
           Export CSV
         </button>
       </div>
+
+      <CSVExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleExportConfirm}
+        defaultColumns={["user_id", "date", "amount", "category", "status"]}
+      />
     </div>
   );
 }

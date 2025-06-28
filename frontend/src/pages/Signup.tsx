@@ -40,7 +40,7 @@ export default function SignupPage() {
       withCredentials: true, 
     });
 
-    if (res.status === 200 && res.data?.token) {
+    if (res.status === 201) {
       // Navigate to dashboard
       navigate("/dashboard");
     } else {
