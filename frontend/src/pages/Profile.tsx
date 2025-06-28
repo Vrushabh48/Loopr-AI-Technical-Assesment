@@ -19,8 +19,10 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get( `${base_url}/profile`, {
-          withCredentials: true,
+        const res = await axios.get(`${base_url}/profile`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         setProfile(res.data);
       } catch (err) {
@@ -52,7 +54,9 @@ export default function Profile() {
     <div className="min-h-screen bg-[#131417] text-white font-poppins flex flex-col">
       {/* Navbar */}
       <div className="bg-[#1A1C22] px-4 sm:px-10 py-4 flex justify-between items-center shadow-md">
-        <h1 className="text-3xl font-serifDisplay font-bold text-white">Penta</h1>
+        <h1 className="text-3xl font-serifDisplay font-bold text-white">
+          Penta
+        </h1>
         <button
           onClick={() => navigate("/dashboard")}
           className="bg-green-600 hover:bg-green-700 px-4 py-2 text-sm sm:text-base rounded-md font-medium text-white"

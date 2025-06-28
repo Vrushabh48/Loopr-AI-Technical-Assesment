@@ -53,10 +53,12 @@ export default function DashboardData() {
     const fetchAnalytics = async () => {
       try {
         const res = await axios.get(`${base_url}/analytics`, {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         setAnalytics(res.data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         if (err.response && err.response.status === 401) {
           navigate("/login");

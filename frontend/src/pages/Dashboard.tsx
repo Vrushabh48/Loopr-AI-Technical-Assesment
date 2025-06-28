@@ -21,7 +21,11 @@ export default function Dashboard() {
       await axios.post(
         `${base_url}/auth/logout`,
         {},
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       navigate("/login");
     } catch (err) {

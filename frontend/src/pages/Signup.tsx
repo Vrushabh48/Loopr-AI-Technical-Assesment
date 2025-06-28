@@ -30,31 +30,33 @@ export default function SignupPage() {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (loading) return;
+    e.preventDefault();
+    if (loading) return;
 
-  setLoading(true);
-  setError("");
+    setLoading(true);
+    setError("");
 
-  try {
-    const res = await axios.post(`${base_url}/auth/signup`, formData, {
-      withCredentials: true, 
-    });
+    try {
+      const res = await axios.post(`${base_url}/auth/signup`, formData);
 
-    if (res.status === 201) {
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } else {
-      setError(res.data?.message || "Signup failed");
-    }
-  } catch (err) {
+      if (res.status === 201) {
+        const token = res.data.token;
+        if (token) {
+          localStorage.setItem("token", token); // ✅ Store token in localStorage
+          navigate("/dashboard"); // ✅ Navigate to dashboard
+        } else {
+          setError("No token received from server.");
+        }
+      } else {
+        setError(res.data?.message || "Signup failed");
+      }
+    } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -159,10 +161,7 @@ export default function SignupPage() {
             </motion.div>
           )}
 
-          <motion.div
-            variants={itemVariants}
-            className="space-y-4"
-          >
+          <motion.div variants={itemVariants} className="space-y-4">
             <div className="space-y-1">
               <label
                 htmlFor="name"

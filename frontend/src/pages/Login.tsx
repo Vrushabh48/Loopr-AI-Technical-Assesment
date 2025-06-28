@@ -2,12 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
-import {
-  FiMail,
-  FiLock,
-  FiArrowRight,
-  FiAlertCircle,
-} from "react-icons/fi";
+import { FiMail, FiLock, FiArrowRight, FiAlertCircle } from "react-icons/fi";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -33,18 +28,18 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await axios.post(
-        `${base_url}/auth/login`,
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
-      
+      const res = await axios.post(`${base_url}/auth/login`, formData);
+
       if (res.status === 200) {
-        navigate("/dashboard");
+        const token = res.data.token;
+        if (token) {
+          localStorage.setItem("token", token); // ✅ Store token in localStorage
+          navigate("/dashboard");
+        } else {
+          setError("No token received from server.");
+        }
       } else {
-        setError(res.data?.message || "Signup failed");
+        setError(res.data?.message || "Login failed");
       }
     } catch (err) {
       console.error(err);
@@ -239,7 +234,7 @@ export default function LoginPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                 Logging In
+                  Logging In
                 </span>
               ) : (
                 <span className="flex items-center">

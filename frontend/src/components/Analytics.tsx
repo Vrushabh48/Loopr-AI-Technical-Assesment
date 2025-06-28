@@ -69,10 +69,12 @@ export default function Analytics() {
     const fetchAnalytics = async () => {
       try {
         const res = await axios.get(`${base_url}/analytics`, {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         setAnalytics(res.data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         if (err.response && err.response.status === 401) {
           navigate("/login");
@@ -90,7 +92,9 @@ export default function Analytics() {
         <>
           {/* 1. Revenue vs Expense Trend */}
           <div className="bg-[#1A1C22] p-4 rounded-xl overflow-x-auto">
-            <h3 className="text-lg font-semibold mb-2">Revenue vs Expense Trend</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Revenue vs Expense Trend
+            </h3>
             <div className="min-w-[300px]">
               <Line
                 data={{
@@ -98,13 +102,17 @@ export default function Analytics() {
                   datasets: [
                     {
                       label: "Revenue",
-                      data: analytics.revenueExpenseTrend.map((d) => d.totalRevenue),
+                      data: analytics.revenueExpenseTrend.map(
+                        (d) => d.totalRevenue
+                      ),
                       borderColor: "green",
                       tension: 0.3,
                     },
                     {
                       label: "Expense",
-                      data: analytics.revenueExpenseTrend.map((d) => d.totalExpense),
+                      data: analytics.revenueExpenseTrend.map(
+                        (d) => d.totalExpense
+                      ),
                       borderColor: "orange",
                       tension: 0.3,
                     },
@@ -159,7 +167,9 @@ export default function Analytics() {
 
           {/* 4. Transaction Count Trend */}
           <div className="bg-[#1A1C22] p-4 rounded-xl overflow-x-auto">
-            <h3 className="text-lg font-semibold mb-2">Monthly Transaction Count</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Monthly Transaction Count
+            </h3>
             <div className="min-w-[300px]">
               <Line
                 data={{
