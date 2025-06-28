@@ -70,7 +70,7 @@ JWT_SECRET="your_jwt_secret"
 tsc -b && node dist/index.js
 ```
 
-### Backend Setup
+### Frontend Setup
 
 ```bash
 # 6. Navigate to the frontend folder
