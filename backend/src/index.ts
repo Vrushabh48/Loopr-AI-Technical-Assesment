@@ -18,10 +18,7 @@ const port = 3000;
 // CORS with credentials
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow all origins when credentials are enabled
-      callback(null, origin || '*');
-    },
+    origin: "https://penta-financial-analytics.vercel.app",
     credentials: true,
   })
 );
